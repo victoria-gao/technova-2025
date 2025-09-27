@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GreenSwap - Clean Frontend
+
+A modern, clean frontend for the GreenSwap sustainable item swapping application built with Next.js 14, TypeScript, and Tailwind CSS.
+
+## Features
+
+### 🎨 Clean Design
+- Modern, minimalist interface with excellent typography
+- Consistent spacing and visual hierarchy
+- Smooth transitions and hover effects
+- Responsive design for all screen sizes
+
+### 🚀 Technology Stack
+- **Next.js 14** with App Router
+- **TypeScript** for type safety
+- **Tailwind CSS** for styling
+- **Lucide React** for icons
+- **Radix UI** components for accessibility
+
+### 📱 Pages
+- **Home Page**: Landing page with authentication and feature highlights
+- **Swipe Page**: Tinder-like interface for discovering items
+- **Profile Page**: User profile management and item listing
+- **Matches Page**: View and manage swap matches
+
+### 🎯 Key Improvements
+- **Better Typography**: Using Inter font for improved readability
+- **Consistent Color Scheme**: Emerald green primary with slate grays
+- **Improved Spacing**: Better use of whitespace and padding
+- **Enhanced Components**: Reusable UI components with proper TypeScript support
+- **Better UX**: Smooth transitions, loading states, and intuitive navigation
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+2. **Run the development server**:
+   ```bash
+   npm run dev
+   ```
+
+3. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Project Structure
+
+```
+frontend-clean/
+├── src/
+│   ├── app/                 # Next.js App Router pages
+│   │   ├── globals.css     # Global styles
+│   │   ├── layout.tsx      # Root layout
+│   │   ├── page.tsx        # Home page
+│   │   ├── swipe/          # Swipe page
+│   │   ├── profile/        # Profile page
+│   │   └── matches/        # Matches page
+│   ├── components/
+│   │   └── ui/             # Reusable UI components
+│   └── lib/
+│       └── utils.ts        # Utility functions
+├── package.json
+├── tailwind.config.ts
+└── tsconfig.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Design Principles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Color Palette
+- **Primary**: Emerald green (`#059669`) for sustainability theme
+- **Secondary**: Slate grays for text and backgrounds
+- **Accent**: Soft pinks and blues for highlights
+- **Success**: Green variants for positive actions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Typography
+- **Font**: Inter for clean, modern readability
+- **Hierarchy**: Clear heading sizes and text weights
+- **Spacing**: Consistent line heights and letter spacing
 
-## Learn More
+### Components
+- **Consistent**: All components follow the same design patterns
+- **Accessible**: Proper ARIA labels and keyboard navigation
+- **Responsive**: Mobile-first design approach
+- **Reusable**: Modular components for easy maintenance
 
-To learn more about Next.js, take a look at the following resources:
+## Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+1. Follow the existing code style and patterns
+2. Use TypeScript for all new components
+3. Ensure responsive design for all screen sizes
+4. Test components thoroughly before submitting
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is part of the Technova 2025 hackathon.
