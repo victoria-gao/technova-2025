@@ -5,6 +5,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 from user.routes import user_bp 
+from item.routes import item_bp
+from exchange.routes import exchange_bp
 
 from flask import Blueprint
 
@@ -14,6 +16,8 @@ app = Flask(__name__)
 CORS(app)
 
 app.register_blueprint(user_bp)
+app.register_blueprint(item_bp)
+app.register_blueprint(exchange_bp)
 main_bp = Blueprint('main', __name__)
 
 

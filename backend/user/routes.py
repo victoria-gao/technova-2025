@@ -23,13 +23,46 @@ def signup():
     data = request.json
     username = data.get("username")
     email = data.get("email")
-    if not username or not email:
-        return jsonify({"error": "Missing username or email"}), 400
-    user_id = User.signup(username, email)  # call function from models.py
-    return jsonify({"message": "User created", "id": user_id})
+    password = data.get("password")
+    
+    if not username or not email or not password:
+        return jsonify({"error": "Missing username, email, or password"}), 400
+    
+    result, status_code = User.signup(username, email, password)
+    return jsonify(result), status_code
 
-@user_bp.route("/users", methods=["GET"])
-def users():
-    users = User.get_all_users()  # call function from models.py
-    return jsonify(users)
+@user_bp.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON"}), 400
+
+    email = data.get('email')
+    password = data.get('password')
+
+    if not all([email, password]):
+        return jsonify({"error": "Missing fields"}), 400
+
+    result, status_code = User.login(data)
+    return jsonify(result), status_code
+
+@user_bp.route("/user/<user_id>", methods=["GET"])
+def get_user(user_id):
+    user = User.get_user_by_id(user_id)
+    if user:
+        return jsonify(user), 200
+    else:
+        return jsonify({"error": "User not found"}), 404
+
+@user_bp.route("/user/<user_id>/profile", methods=["PUT"])
+def update_user_profile(user_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON"}), 400
+    
+    success = User.update_profile(user_id, data)
+    if success:
+        return jsonify({"message": "Profile updated successfully"}), 200
+    else:
+        return jsonify({"error": "Failed to update profile"}), 400
 
