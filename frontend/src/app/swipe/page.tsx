@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -74,18 +75,42 @@ export default function SwipePage() {
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [likedItems, setLikedItems] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
+  const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
 
   const currentItem = mockItems[currentItemIndex];
 
   const handleLike = () => {
-    if (currentItem) {
+    if (currentItem && !isExiting) {
       setLikedItems([...likedItems, currentItem.id]);
+      setExitDirection('right');
+      setIsExiting(true);
+      
+      // Change item immediately, animation will handle the exit
       nextItem();
+      
+      // Reset state after a short delay
+      setTimeout(() => {
+        setIsExiting(false);
+        setExitDirection(null);
+      }, 100);
     }
   };
 
   const handlePass = () => {
-    nextItem();
+    if (!isExiting) {
+      setExitDirection('left');
+      setIsExiting(true);
+      
+      // Change item immediately, animation will handle the exit
+      nextItem();
+      
+      // Reset state after a short delay
+      setTimeout(() => {
+        setIsExiting(false);
+        setExitDirection(null);
+      }, 100);
+    }
   };
 
   const nextItem = () => {
@@ -178,71 +203,107 @@ export default function SwipePage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-sm mx-auto">
-          {/* Item Card */}
-          <Card className="overflow-hidden shadow-xl border-0">
-            <div className="relative">
-              <img
-                src={currentItem.image}
-                alt={currentItem.name}
-                className="w-full h-96 object-cover"
-              />
-              <div className="absolute top-4 left-4">
-                <Badge className="bg-white/90 text-slate-900 hover:bg-white/90">
-                  {currentItem.category}
-                </Badge>
-              </div>
-              <div className="absolute top-4 right-4">
-                <Badge variant="secondary" className="bg-white/90 text-slate-900 hover:bg-white/90">
-                  {currentItem.condition}
-                </Badge>
-              </div>
-            </div>
-            
-            <CardContent className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 mb-2">
-                    {currentItem.name}
-                  </h2>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    {currentItem.description}
-                  </p>
-                </div>
-
-                {/* User Info */}
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                  <Avatar 
-                    src={currentItem.user.avatar} 
-                    alt={currentItem.user.name}
-                    fallback={currentItem.user.name.charAt(0)}
-                    className="h-10 w-10"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-900">
-                        {currentItem.user.name}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                        <span className="text-xs text-slate-600">
-                          {currentItem.user.rating}
-                        </span>
-                      </div>
+          {/* Card Container */}
+          <div className="relative h-[620px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentItemIndex}
+                className="absolute inset-0"
+                initial={{ 
+                  opacity: 0, 
+                  scale: 0.9, 
+                  y: 20,
+                  x: 0
+                }}
+                animate={{ 
+                  opacity: 1, 
+                  scale: 1, 
+                  y: 0,
+                  x: 0
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.8,
+                  x: exitDirection === 'right' ? 400 : exitDirection === 'left' ? -400 : 0,
+                  y: -20,
+                  rotate: exitDirection === 'right' ? 15 : exitDirection === 'left' ? -15 : 0,
+                  transition: {
+                    duration: 0.4,
+                    ease: "easeInOut"
+                  }
+                }}
+                transition={{ 
+                  duration: 0.4,
+                  ease: "easeOut"
+                }}
+              >
+                <Card className="overflow-hidden shadow-xl border-0 h-full">
+                  <div className="relative">
+                    <img
+                      src={currentItem.image}
+                      alt={currentItem.name}
+                      className="w-full h-96 object-cover"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <Badge className="bg-white/90 text-slate-900 hover:bg-white/90">
+                        {currentItem.category}
+                      </Badge>
                     </div>
-                    <div className="text-xs text-slate-500">
-                      {currentItem.user.swaps} swaps • {currentItem.posted}
+                    <div className="absolute top-4 right-4">
+                      <Badge variant="secondary" className="bg-white/90 text-slate-900 hover:bg-white/90">
+                        {currentItem.condition}
+                      </Badge>
                     </div>
                   </div>
-                </div>
+                  
+                  <CardContent className="p-6">
+                    <div className="space-y-4">
+                      <div>
+                        <h2 className="text-xl font-bold text-slate-900 mb-2">
+                          {currentItem.name}
+                        </h2>
+                        <p className="text-slate-600 text-sm leading-relaxed">
+                          {currentItem.description}
+                        </p>
+                      </div>
 
-                {/* Location */}
-                <div className="flex items-center gap-2 text-sm text-slate-600">
-                  <MapPin className="h-4 w-4" />
-                  <span>{currentItem.distance} away</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                      {/* User Info */}
+                      <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                        <Avatar 
+                          src={currentItem.user.avatar} 
+                          alt={currentItem.user.name}
+                          fallback={currentItem.user.name.charAt(0)}
+                          className="h-10 w-10"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-slate-900">
+                              {currentItem.user.name}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                              <span className="text-xs text-slate-600">
+                                {currentItem.user.rating}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            {currentItem.user.swaps} swaps • {currentItem.posted}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Location */}
+                      <div className="flex items-center gap-2 text-sm text-slate-600">
+                        <MapPin className="h-4 w-4" />
+                        <span>{currentItem.distance} away</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-center gap-6 mt-8">
@@ -251,6 +312,7 @@ export default function SwipePage() {
               variant="outline"
               className="rounded-full h-14 w-14 border-2 border-slate-300 hover:border-slate-400"
               onClick={handlePass}
+              disabled={isExiting}
             >
               <X className="h-6 w-6 text-slate-600" />
             </Button>
@@ -258,6 +320,7 @@ export default function SwipePage() {
               size="lg"
               className="rounded-full h-14 w-14 bg-emerald-600 hover:bg-emerald-700"
               onClick={handleLike}
+              disabled={isExiting}
             >
               <Heart className="h-6 w-6" />
             </Button>
