@@ -1,107 +1,80 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
-import { 
-  ArrowLeft, 
-  MessageCircle, 
-  MapPin, 
-  Clock, 
-  CheckCircle,
-  XCircle,
-  Star,
-  Filter,
-  Search
-} from "lucide-react";
-import Link from "next/link";
+import { ArrowLeft, ArrowLeftRight, MapPin, Star, CalendarDays } from "lucide-react";
 
-// Mock data for matches
-const mockMatches = [
+// Mock data for trade history
+const tradeHistory = [
   {
-    id: 1,
-    item: {
+    id: 101,
+    date: "2025-09-15",
+    youGave: {
+      name: "Vintage Camera",
+      image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=300&h=300&fit=crop",
+      category: "Electronics"
+    },
+    youGot: {
       name: "Vintage Denim Jacket",
       image: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=300&h=300&fit=crop",
       category: "Clothing"
     },
-    user: {
+    partner: {
       name: "Sarah M.",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
       rating: 4.8,
       distance: "0.5 miles"
     },
-    status: "pending",
-    matchedAt: "2 hours ago",
-    message: "Hi! I'm interested in your vintage camera. Would you like to swap for my denim jacket?"
+    location: "San Francisco, CA"
   },
   {
-    id: 2,
-    item: {
+    id: 102,
+    date: "2025-09-01",
+    youGave: {
+      name: "Coffee Maker",
+      image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=300&fit=crop",
+      category: "Kitchen"
+    },
+    youGot: {
       name: "Coffee Table Books Collection",
       image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=300&fit=crop",
       category: "Books"
     },
-    user: {
+    partner: {
       name: "Alex K.",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
       rating: 4.9,
       distance: "1.2 miles"
     },
-    status: "accepted",
-    matchedAt: "1 day ago",
-    message: "Perfect! When would be a good time to meet?"
+    location: "San Jose, CA"
   },
   {
-    id: 3,
-    item: {
+    id: 103,
+    date: "2025-08-12",
+    youGave: {
       name: "Indoor Plant Collection",
       image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=300&h=300&fit=crop",
       category: "Plants"
     },
-    user: {
+    youGot: {
+      name: "Ceramic Pots Set",
+      image: "https://images.unsplash.com/photo-1605745341112-85968c1f524e?w=300&h=300&fit=crop",
+      category: "Home"
+    },
+    partner: {
       name: "Emma L.",
       avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
       rating: 4.7,
       distance: "0.8 miles"
     },
-    status: "completed",
-    matchedAt: "3 days ago",
-    message: "Thanks for the great swap! The plants are thriving in my living room."
+    location: "Oakland, CA"
   }
 ];
 
 export default function MatchesPage() {
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [showFilters, setShowFilters] = useState(false);
-
-  const filteredMatches = mockMatches.filter(match => {
-    if (selectedFilter === "all") return true;
-    return match.status === selectedFilter;
-  });
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending": return "bg-yellow-100 text-yellow-800";
-      case "accepted": return "bg-blue-100 text-blue-800";
-      case "completed": return "bg-emerald-100 text-emerald-800";
-      case "declined": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "pending": return <Clock className="h-3 w-3" />;
-      case "accepted": return <CheckCircle className="h-3 w-3" />;
-      case "completed": return <CheckCircle className="h-3 w-3" />;
-      case "declined": return <XCircle className="h-3 w-3" />;
-      default: return null;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30">
       {/* Header */}
@@ -128,53 +101,17 @@ export default function MatchesPage() {
         </div>
       </header>
 
-      {/* Filters */}
-      {showFilters && (
-        <div className="bg-white border-b p-4">
-          <div className="container mx-auto">
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search matches..."
-                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
-                {["all", "pending", "accepted", "completed"].map((filter) => (
-                  <Button
-                    key={filter}
-                    variant={selectedFilter === filter ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedFilter(filter)}
-                    className="capitalize"
-                  >
-                    {filter}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {filteredMatches.length === 0 ? (
+        <div className="max-w-4xl mx-auto space-y-6">
+          {tradeHistory.length === 0 ? (
             <Card className="text-center border-0 shadow-sm">
               <CardContent className="p-12">
-                <div className="p-4 bg-slate-100 rounded-full w-fit mx-auto mb-6">
-                  <MessageCircle className="h-8 w-8 text-slate-600" />
-                </div>
                 <h2 className="text-xl font-semibold text-slate-900 mb-2">
-                  No matches yet
+                  No trades yet
                 </h2>
                 <p className="text-slate-600 mb-6">
-                  Start swiping to find items you love and make connections with other users.
+                  When you complete swaps, they’ll show up here.
                 </p>
                 <Link href="/swipe">
                   <Button>
@@ -184,104 +121,76 @@ export default function MatchesPage() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-6">
-              {filteredMatches.map((match) => (
-                <Card key={match.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex gap-6">
-                      {/* Item Image */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={match.item.image}
-                          alt={match.item.name}
-                          className="w-20 h-20 rounded-lg object-cover"
-                        />
-                      </div>
-
-                      {/* Match Info */}
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <h3 className="font-semibold text-slate-900 mb-1">
-                              {match.item.name}
-                            </h3>
-                            <div className="flex items-center gap-4 text-sm text-slate-600">
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                <span>{match.user.distance}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                <span>{match.matchedAt}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <Badge className={getStatusColor(match.status)}>
-                            <div className="flex items-center gap-1">
-                              {getStatusIcon(match.status)}
-                              <span className="capitalize">{match.status}</span>
-                            </div>
-                          </Badge>
-                        </div>
-
-                        {/* User Info */}
-                        <div className="flex items-center gap-3">
-                          <Avatar 
-                            src={match.user.avatar} 
-                            alt={match.user.name}
-                            fallback={match.user.name.charAt(0)}
-                            className="h-8 w-8"
-                          />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-slate-900 text-sm">
-                                {match.user.name}
-                              </span>
-                              <div className="flex items-center gap-1">
-                                <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                                <span className="text-xs text-slate-600">
-                                  {match.user.rating}
-                                </span>
-                              </div>
-                            </div>
+            tradeHistory.map((t) => (
+              <Card key={t.id} className="border-0 shadow-sm hover:shadow-md transition-shadow">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <CalendarDays className="h-3 w-3" />
+                      <span>{new Date(t.date).toLocaleDateString()}</span>
+                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Avatar 
+                        src={t.partner.avatar}
+                        alt={t.partner.name}
+                        fallback={t.partner.name.charAt(0)}
+                        className="h-8 w-8"
+                      />
+                      <div className="text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-slate-900">{t.partner.name}</span>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                            <span className="text-xs text-slate-600">{t.partner.rating}</span>
                           </div>
                         </div>
-
-                        {/* Message */}
-                        <div className="bg-slate-50 rounded-lg p-3">
-                          <p className="text-sm text-slate-700">
-                            {match.message}
-                          </p>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-3">
-                          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                            <MessageCircle className="h-4 w-4 mr-2" />
-                            Message
-                          </Button>
-                          {match.status === "pending" && (
-                            <>
-                              <Button size="sm" variant="outline">
-                                Accept
-                              </Button>
-                              <Button size="sm" variant="outline">
-                                Decline
-                              </Button>
-                            </>
-                          )}
-                          {match.status === "accepted" && (
-                            <Button size="sm" variant="outline">
-                              Mark Complete
-                            </Button>
-                          )}
+                        <div className="text-xs text-slate-500 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          <span>{t.partner.distance}</span>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 pt-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 items-center">
+                    {/* You Gave */}
+                    <div className="sm:col-span-2">
+                      <div className="text-xs uppercase tracking-wide text-slate-500 mb-2">You gave</div>
+                      <div className="flex items-center gap-3">
+                        <img src={t.youGave.image} alt={t.youGave.name} className="h-16 w-16 rounded-lg object-cover" />
+                        <div>
+                          <div className="font-medium text-slate-900">{t.youGave.name}</div>
+                          <Badge variant="outline" className="text-xs mt-1">{t.youGave.category}</Badge>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Arrow */}
+                    <div className="hidden sm:flex items-center justify-center">
+                      <ArrowLeftRight className="h-5 w-5 text-slate-400" />
+                    </div>
+
+                    {/* You Got */}
+                    <div className="sm:col-span-2">
+                      <div className="text-xs uppercase tracking-wide text-slate-500 mb-2">You got</div>
+                      <div className="flex items-center gap-3">
+                        <img src={t.youGot.image} alt={t.youGot.name} className="h-16 w-16 rounded-lg object-cover" />
+                        <div>
+                          <div className="font-medium text-slate-900">{t.youGot.name}</div>
+                          <Badge variant="outline" className="text-xs mt-1">{t.youGot.category}</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 text-sm text-slate-600 flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{t.location}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
           )}
         </div>
       </div>
