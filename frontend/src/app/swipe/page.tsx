@@ -314,7 +314,9 @@ export default function SwipePage() {
               onClick={handlePass}
               disabled={isExiting}
             >
-              <X className="h-6 w-6 text-slate-600" />
+              <div>
+                <X className="h-6 w-6 text-slate-600" />
+              </div>
             </Button>
             <Button
               size="lg"
@@ -322,7 +324,9 @@ export default function SwipePage() {
               onClick={handleLike}
               disabled={isExiting}
             >
-              <Heart className="h-6 w-6" />
+              <div>
+                <Heart className="h-6 w-6 text-white" />
+              </div>
             </Button>
           </div>
 
