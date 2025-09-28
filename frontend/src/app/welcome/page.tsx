@@ -1,10 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Leaf, Sparkles, ArrowRight } from "lucide-react";
 
 export default function WelcomePage() {
+  const [user, setUser] = useState<{ name?: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Example API call to fetch user data
+    fetch("/api/user")
+      .then((res) => res.json())
+      .then((data) => {
+        setUser(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Navigation */}
@@ -17,23 +32,6 @@ export default function WelcomePage() {
               </div>
               <h1 className="text-xl font-bold text-slate-900">GreenSwap</h1>
             </div>
-            {/* <div className="flex items-center gap-4">
-              <Link href="/swipe">
-                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                  Start Swiping
-                </Button>
-              </Link>
-              <Link href="/profile">
-                <Button variant="ghost" size="sm">
-                  Profile
-                </Button>
-              </Link>
-              <Link href="/matches">
-                <Button variant="ghost" size="sm">
-                  Matches
-                </Button>
-              </Link>
-            </div> */}
           </div>
         </div>
       </nav>
@@ -43,7 +41,9 @@ export default function WelcomePage() {
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4" />
-            Welcome back!
+            {loading
+              ? "Loading..."
+              : `Welcome back${user?.name ? `, ${user.name}` : ""}!`}
           </div>
           <h1 className="text-4xl font-bold text-slate-900 mb-4">
             Ready to discover amazing items?

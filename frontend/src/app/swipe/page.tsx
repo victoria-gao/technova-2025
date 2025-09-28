@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,6 +18,23 @@ import {
   Search
 } from "lucide-react";
 import Link from "next/link";
+import { apiService } from "@/lib/api";
+import { useRouter } from "next/navigation";
+
+interface Item {
+  _id: string;
+  title: string;
+  description: string;
+  category: string;
+  condition: string;
+  location: string;
+  images: string[];
+  created_at: string;
+  owner: {
+    username: string;
+    profile: any;
+  };
+}
 
 // Mock data for items
 const mockItems = [
@@ -72,49 +89,95 @@ const mockItems = [
 ];
 
 export default function SwipePage() {
+  const [items, setItems] = useState<Item[]>([]);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
-  const [likedItems, setLikedItems] = useState<number[]>([]);
+  const [likedItems, setLikedItems] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const [exitDirection, setExitDirection] = useState<'left' | 'right' | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
 
-  const currentItem = mockItems[currentItemIndex];
+  // Check if user is logged in
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (!savedUser) {
+      router.push('/');
+      return;
+    }
+    setUser(JSON.parse(savedUser));
+  }, [router]);
 
-  const handleLike = () => {
-    if (currentItem && !isExiting) {
-      setLikedItems([...likedItems, currentItem.id]);
-      setExitDirection('right');
-      setIsExiting(true);
-      
-      // Change item immediately, animation will handle the exit
-      nextItem();
-      
-      // Reset state after a short delay
-      setTimeout(() => {
-        setIsExiting(false);
-        setExitDirection(null);
-      }, 100);
+  // Load items when user is available
+  useEffect(() => {
+    if (user) {
+      loadItems();
+    }
+  }, [user]);
+
+  const loadItems = async () => {
+    try {
+      const response = await apiService.getItems(user.user_id);
+      if (response.items) {
+        setItems(response.items);
+      }
+    } catch (error) {
+      console.error('Failed to load items:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePass = () => {
-    if (!isExiting) {
-      setExitDirection('left');
-      setIsExiting(true);
-      
-      // Change item immediately, animation will handle the exit
-      nextItem();
-      
-      // Reset state after a short delay
-      setTimeout(() => {
-        setIsExiting(false);
-        setExitDirection(null);
-      }, 100);
+  const currentItem = items[currentItemIndex];
+
+  const handleLike = async () => {
+    if (currentItem && !isExiting && user) {
+      try {
+        await apiService.likeItem(currentItem._id, user.user_id);
+        setLikedItems([...likedItems, currentItem._id]);
+        setExitDirection('right');
+        setIsExiting(true);
+        
+        // Change item immediately, animation will handle the exit
+        nextItem();
+        
+        // Reset state after a short delay
+        setTimeout(() => {
+          setIsExiting(false);
+          setExitDirection(null);
+        }, 100);
+      } catch (error) {
+        console.error('Failed to like item:', error);
+      }
+    }
+  };
+
+  const handlePass = async () => {
+    if (!isExiting && user) {
+      try {
+        if (currentItem) {
+          await apiService.passItem(currentItem._id, user.user_id);
+        }
+        setExitDirection('left');
+        setIsExiting(true);
+        
+        // Change item immediately, animation will handle the exit
+        nextItem();
+        
+        // Reset state after a short delay
+        setTimeout(() => {
+          setIsExiting(false);
+          setExitDirection(null);
+        }, 100);
+      } catch (error) {
+        console.error('Failed to pass item:', error);
+      }
     }
   };
 
   const nextItem = () => {
-    if (currentItemIndex < mockItems.length - 1) {
+    if (currentItemIndex < items.length - 1) {
       setCurrentItemIndex(currentItemIndex + 1);
     } else {
       // End of items - could show a completion screen
