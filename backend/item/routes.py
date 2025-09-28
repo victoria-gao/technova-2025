@@ -1,7 +1,51 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_from_directory
+from werkzeug.utils import secure_filename
+import os
+import uuid
 from .models import Item
 
 item_bp = Blueprint('item', __name__)
+
+# Configure upload folder
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@item_bp.route("/items/upload-image", methods=["POST"])
+def upload_image():
+    """Upload an image for an item"""
+    if 'image' not in request.files:
+        return jsonify({"error": "No image file provided"}), 400
+    
+    file = request.files['image']
+    if file.filename == '':
+        return jsonify({"error": "No image selected"}), 400
+    
+    if file and allowed_file(file.filename):
+        # Create uploads directory if it doesn't exist
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+        
+        # Generate unique filename
+        filename = secure_filename(file.filename)
+        unique_filename = f"{uuid.uuid4()}_{filename}"
+        filepath = os.path.join(UPLOAD_FOLDER, unique_filename)
+        
+        # Save file
+        file.save(filepath)
+        
+        # Return the file URL (you might want to serve this through Flask or use a CDN)
+        image_url = f"/uploads/{unique_filename}"
+        return jsonify({"message": "Image uploaded successfully", "image_url": image_url}), 200
+    
+    return jsonify({"error": "Invalid file type"}), 400
+
+@item_bp.route("/uploads/<filename>")
+def uploaded_file(filename):
+    """Serve uploaded images"""
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 @item_bp.route("/items", methods=["POST"])
 def create_item():
