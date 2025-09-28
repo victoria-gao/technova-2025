@@ -17,6 +17,15 @@ export default function WelcomePage() {
               </div>
               <h1 className="text-xl font-bold text-slate-900">GreenSwap</h1>
             </div>
+            <Link href="/">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="ml-6 px-3 py-1 rounded-full bg-red-400 text-white hover:bg-red-500 hover:text-white"
+                >
+                  Log Out
+                </Button>
+              </Link>
             {/* <div className="flex items-center gap-4">
               <Link href="/swipe">
                 <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">

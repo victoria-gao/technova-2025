@@ -87,8 +87,16 @@ export default function MatchesPage() {
                 Back
               </Button>
             </Link>
-            <h1 className="text-lg font-semibold text-slate-900">Trade History</h1>
-            <div className="w-9" />
+            <h1 className="text-lg font-semibold text-slate-900">My Matches</h1>
+            <Link href="/">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="ml-6 px-3 py-1 rounded-full bg-red-400 text-white hover:bg-red-500 hover:text-white"
+                >
+                  Log Out
+                </Button>
+            </Link>
           </div>
         </div>
       </header>

@@ -163,13 +163,15 @@ export default function SwipePage() {
               </Button>
             </Link>
             <h1 className="text-lg font-semibold text-slate-900">Discover Items</h1>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter className="h-4 w-4" />
-            </Button>
+            <Link href="/">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="ml-6 px-3 py-1 rounded-full bg-red-400 text-white hover:bg-red-500 hover:text-white"
+                >
+                  Log Out
+                </Button>
+              </Link>
           </div>
         </div>
       </header>
@@ -314,7 +316,9 @@ export default function SwipePage() {
               onClick={handlePass}
               disabled={isExiting}
             >
-              <X className="h-6 w-6 text-slate-600" />
+              <div>
+                <X className="h-6 w-6 text-slate-600" />
+              </div>
             </Button>
             <Button
               size="lg"
@@ -322,7 +326,9 @@ export default function SwipePage() {
               onClick={handleLike}
               disabled={isExiting}
             >
-              <Heart className="h-6 w-6" />
+              <div>
+                <Heart className="h-6 w-6 text-white" />
+              </div>
             </Button>
           </div>
 
