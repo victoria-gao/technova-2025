@@ -1,6 +1,7 @@
 from datetime import datetime
 from bson.objectid import ObjectId
-from db import collection
+from db import items_col, users_col
+
 
 class Exchange:
     @staticmethod

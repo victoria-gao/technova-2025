@@ -1,24 +1,42 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Leaf, Sparkles, ArrowRight } from "lucide-react";
 
+interface User {
+  user_id: string;
+  username: string;
+  email: string;
+  profile?: any;
+}
+
 export default function WelcomePage() {
-  const [user, setUser] = useState<{ name?: string } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const params = useParams(); // Gets { user_id } from the URL
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Example API call to fetch user data
-    fetch("/api/user")
-      .then((res) => res.json())
-      .then((data) => {
-        setUser(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      // If user_id in URL doesn't match localStorage, redirect to home
+      if (parsedUser.user_id !== params.user_id) {
+        router.push("/");
+      } else {
+        setUser(parsedUser);
+      }
+    } else {
+      // Not logged in, redirect to home
+      router.push("/");
+    }
+  }, [params.user_id, router]);
+
+  if (!user) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen">
@@ -41,9 +59,7 @@ export default function WelcomePage() {
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4" />
-            {loading
-              ? "Loading..."
-              : `Welcome back${user?.name ? `, ${user.name}` : ""}!`}
+            Welcome back, {user.username}!
           </div>
           <h1 className="text-4xl font-bold text-slate-900 mb-4">
             Ready to discover amazing items?

@@ -1,6 +1,6 @@
 from datetime import datetime
 from bson.objectid import ObjectId
-from db import collection
+from db import items_col, users_col
 
 class Item:
     @staticmethod
@@ -21,7 +21,7 @@ class Item:
                 "likes": [],
                 "likes_count": 0
             }
-            result = collection.insert_one(item)
+            result = items_col.insert_one(item)
             return {"message": "Item created successfully", "item_id": str(result.inserted_id)}, 200
         except Exception as e:
             return {"error": f"Failed to create item: {str(e)}"}, 400
@@ -34,14 +34,14 @@ class Item:
             if exclude_user:
                 query["user_id"] = {"$ne": ObjectId(user_id)}
             
-            items = list(collection.find(query).sort("created_at", -1))
+            items = list(items_col.find(query).sort("created_at", -1))
             
             # Convert ObjectId to string and add user info
             for item in items:
                 item["_id"] = str(item["_id"])
                 item["user_id"] = str(item["user_id"])
                 # Get user info for each item
-                user = collection.find_one({"_id": ObjectId(item["user_id"])})
+                user = users_col.find_one({"_id": ObjectId(item["user_id"])})
                 if user:
                     item["owner"] = {
                         "username": user.get("username"),
@@ -56,7 +56,7 @@ class Item:
     def get_user_items(user_id):
         """Get items posted by a specific user"""
         try:
-            items = list(collection.find({"user_id": ObjectId(user_id)}).sort("created_at", -1))
+            items = list(items_col.find({"user_id": ObjectId(user_id)}).sort("created_at", -1))
             for item in items:
                 item["_id"] = str(item["_id"])
                 item["user_id"] = str(item["user_id"])
@@ -68,12 +68,12 @@ class Item:
     def get_item_by_id(item_id):
         """Get a specific item by ID"""
         try:
-            item = collection.find_one({"_id": ObjectId(item_id)})
+            item = items_col.find_one({"_id": ObjectId(item_id)})
             if item:
                 item["_id"] = str(item["_id"])
                 item["user_id"] = str(item["user_id"])
                 # Get owner info
-                user = collection.find_one({"_id": ObjectId(item["user_id"])})
+                user = users_col.find_one({"_id": ObjectId(item["user_id"])})
                 if user:
                     item["owner"] = {
                         "username": user.get("username"),
@@ -90,7 +90,7 @@ class Item:
         """Like an item"""
         try:
             # Check if user already liked this item
-            item = collection.find_one({"_id": ObjectId(item_id)})
+            item = items_col.find_one({"_id": ObjectId(item_id)})
             if not item:
                 return {"error": "Item not found"}, 404
             
@@ -98,7 +98,7 @@ class Item:
                 return {"message": "Already liked"}, 200
             
             # Add like
-            result = collection.update_one(
+            result = items_col.update_one(
                 {"_id": ObjectId(item_id)},
                 {
                     "$push": {"likes": user_id},
@@ -117,7 +117,7 @@ class Item:
     def unlike_item(item_id, user_id):
         """Unlike an item"""
         try:
-            result = collection.update_one(
+            result = items_col.update_one(
                 {"_id": ObjectId(item_id)},
                 {
                     "$pull": {"likes": user_id},
@@ -145,12 +145,12 @@ class Item:
     def get_liked_items(user_id):
         """Get items liked by a user"""
         try:
-            items = list(collection.find({"likes": user_id, "status": "available"}).sort("created_at", -1))
+            items = list(items_col.find({"likes": user_id, "status": "available"}).sort("created_at", -1))
             for item in items:
                 item["_id"] = str(item["_id"])
                 item["user_id"] = str(item["user_id"])
                 # Get owner info
-                user = collection.find_one({"_id": ObjectId(item["user_id"])})
+                user = users_col.find_one({"_id": ObjectId(item["user_id"])})
                 if user:
                     item["owner"] = {
                         "username": user.get("username"),
@@ -165,10 +165,10 @@ class Item:
         """Get items where both users liked each other's items"""
         try:
             # Get items liked by the user
-            liked_items = list(collection.find({"likes": user_id, "status": "available"}))
+            liked_items = list(items_col.find({"likes": user_id, "status": "available"}))
             
             # Get items posted by the user
-            user_items = list(collection.find({"user_id": ObjectId(user_id), "status": "available"}))
+            user_items = list(items_col.find({"user_id": ObjectId(user_id), "status": "available"}))
             
             matches = []
             
@@ -208,7 +208,7 @@ class Item:
     def update_item_status(item_id, status):
         """Update item status (available, exchanged, removed)"""
         try:
-            result = collection.update_one(
+            result = items_col.update_one(
                 {"_id": ObjectId(item_id)},
                 {
                     "$set": {

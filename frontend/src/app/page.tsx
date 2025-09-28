@@ -59,7 +59,7 @@ export default function HomePage() {
         setUser(response);
         setIsLoggedIn(true);
         localStorage.setItem('user', JSON.stringify(response));
-        router.push("/welcome"); // Redirect to welcome page
+        router.push(`/welcome/${response.user_id}`); // Redirect to welcome page
       }
     } catch (err) {
       setError("Login failed. Please try again.");
@@ -91,7 +91,7 @@ export default function HomePage() {
           setUser(loginResponse);
           setIsLoggedIn(true);
           localStorage.setItem('user', JSON.stringify(loginResponse));
-          router.push("/welcome"); // Redirect to welcome page
+          router.push(`/welcome/${loginResponse.user_id}`); // Redirect to welcome page
         }
       }
     } catch (err) {
