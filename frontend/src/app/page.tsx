@@ -114,39 +114,19 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="py-20">
+      <section className="py-10">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="space-y-8">
               <div className="space-y-4">
-                <Badge variant="secondary" className="w-fit">
-                  <Globe className="h-3 w-3 mr-1" />
-                  Join 50,000+ users worldwide
-                </Badge>
                 <h1 className="text-5xl font-bold text-slate-900 leading-tight">
-                  Sustainable living made{" "}
-                  <span className="text-emerald-600">simple</span>
+                  One's Trash Can Be Another's{" "}
+                  <span className="text-emerald-600">Treasure</span>
                 </h1>
                 <p className="text-xl text-slate-600 leading-relaxed">
                   Discover, exchange, and give new life to pre-loved items in your community. 
                   Join thousands making a positive impact on our planet, one swap at a time.
                 </p>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-8 py-8">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-600">50K+</div>
-                  <div className="text-sm text-slate-600">Items exchanged</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-600">25K+</div>
-                  <div className="text-sm text-slate-600">Happy users</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-600">100+</div>
-                  <div className="text-sm text-slate-600">Cities</div>
-                </div>
               </div>
 
               {/* Features */}
