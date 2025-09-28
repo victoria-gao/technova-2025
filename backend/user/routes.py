@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 # from google.auth.transport import requests as grequests
 # import os
 # from dotenv import load_dotenv
-from db import users_col
+from db import users_col, exchanges_col
 from user.models import User
 #from . import user_bp
 #from user.models import User
@@ -60,3 +60,11 @@ def update_user_profile(user_id):
     else:
         return jsonify({"error": "Failed to update profile"}), 400
 
+@user_bp.route("/user/<user_id>/exchanges", methods=["GET"])
+def get_user_exchanges(user_id):
+    exchanges = list(exchanges_col.find({
+        "$or": [{"user1_id": user_id}, {"user2_id": user_id}]
+    }))
+    for ex in exchanges:
+        ex["_id"] = str(ex["_id"])
+    return jsonify(exchanges)

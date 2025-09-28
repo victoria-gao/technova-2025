@@ -1,6 +1,6 @@
 from datetime import datetime
 from bson.objectid import ObjectId
-from db import items_col, users_col
+from db import items_col, users_col, exchanges_col  # <-- add exchanges_col
 
 
 class Exchange:
@@ -19,7 +19,7 @@ class Exchange:
                 "messages": [],
                 "completion_date": None
             }
-            result = collection.insert_one(exchange)
+            result = exchanges_col.insert_one(exchange)  # changed
             return {"message": "Exchange created successfully", "exchange_id": str(result.inserted_id)}, 200
         except Exception as e:
             return {"error": f"Failed to create exchange: {str(e)}"}, 400
@@ -28,7 +28,7 @@ class Exchange:
     def get_user_exchanges(user_id):
         """Get all exchanges for a user"""
         try:
-            exchanges = list(collection.find({
+            exchanges = list(exchanges_col.find({
                 "$or": [
                     {"user1_id": ObjectId(user_id)},
                     {"user2_id": ObjectId(user_id)}
@@ -44,9 +44,9 @@ class Exchange:
                 exchange["item2_id"] = str(exchange["item2_id"])
                 
                 # Get item details
-                item1 = collection.find_one({"_id": ObjectId(exchange["item1_id"])})
-                item2 = collection.find_one({"_id": ObjectId(exchange["item2_id"])})
-                
+                item1 = items_col.find_one({"_id": ObjectId(exchange["item1_id"])})
+                item2 = items_col.find_one({"_id": ObjectId(exchange["item2_id"])})  # fixed
+
                 if item1:
                     exchange["item1_details"] = {
                         "title": item1["title"],
@@ -62,8 +62,8 @@ class Exchange:
                     }
                 
                 # Get user details
-                user1 = collection.find_one({"_id": ObjectId(exchange["user1_id"])})
-                user2 = collection.find_one({"_id": ObjectId(exchange["user2_id"])})
+                user1 = users_col.find_one({"_id": ObjectId(exchange["user1_id"])})
+                user2 = users_col.find_one({"_id": ObjectId(exchange["user2_id"])})
                 
                 if user1:
                     exchange["user1_details"] = {
@@ -93,7 +93,7 @@ class Exchange:
             if status == "completed":
                 update_data["completion_date"] = datetime.utcnow()
             
-            result = collection.update_one(
+            result = exchanges_col.update_one(  # changed
                 {"_id": ObjectId(exchange_id)},
                 {"$set": update_data}
             )
@@ -115,7 +115,7 @@ class Exchange:
                 "timestamp": datetime.utcnow()
             }
             
-            result = collection.update_one(
+            result = exchanges_col.update_one(  # changed
                 {"_id": ObjectId(exchange_id)},
                 {"$push": {"messages": message_data}}
             )
@@ -131,7 +131,7 @@ class Exchange:
     def get_exchange_by_id(exchange_id):
         """Get a specific exchange by ID"""
         try:
-            exchange = collection.find_one({"_id": ObjectId(exchange_id)})
+            exchange = exchanges_col.find_one({"_id": ObjectId(exchange_id)})  # changed
             if exchange:
                 exchange["_id"] = str(exchange["_id"])
                 exchange["user1_id"] = str(exchange["user1_id"])
@@ -148,12 +148,12 @@ class Exchange:
     def complete_exchange(exchange_id):
         """Mark an exchange as completed and update item statuses"""
         try:
-            exchange = collection.find_one({"_id": ObjectId(exchange_id)})
+            exchange = exchanges_col.find_one({"_id": ObjectId(exchange_id)})  # changed
             if not exchange:
                 return {"error": "Exchange not found"}, 404
             
             # Update exchange status
-            result = collection.update_one(
+            result = exchanges_col.update_one(  # changed
                 {"_id": ObjectId(exchange_id)},
                 {
                     "$set": {
@@ -166,13 +166,13 @@ class Exchange:
             
             if result.modified_count > 0:
                 # Update item statuses to exchanged
-                collection.update_many(
+                items_col.update_many(  # changed
                     {"_id": {"$in": [exchange["item1_id"], exchange["item2_id"]]}},
                     {"$set": {"status": "exchanged", "updated_at": datetime.utcnow()}}
                 )
                 
                 # Update user stats
-                collection.update_many(
+                users_col.update_many(
                     {"_id": {"$in": [exchange["user1_id"], exchange["user2_id"]]}},
                     {"$inc": {"stats.items_exchanged": 1}}
                 )

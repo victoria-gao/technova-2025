@@ -1,43 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Leaf, Sparkles, ArrowRight } from "lucide-react";
 
-interface User {
-  user_id: string;
-  username: string;
-  email: string;
-  profile?: any;
-}
-
 export default function WelcomePage() {
-  const params = useParams(); // Gets { user_id } from the URL
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      // If user_id in URL doesn't match localStorage, redirect to home
-      if (parsedUser.user_id !== params.user_id) {
-        router.push("/");
-      } else {
-        setUser(parsedUser);
-      }
-    } else {
-      // Not logged in, redirect to home
-      router.push("/");
-    }
-  }, [params.user_id, router]);
-
-  if (!user) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
   return (
     <div className="min-h-screen">
       {/* Navigation */}
@@ -50,6 +17,23 @@ export default function WelcomePage() {
               </div>
               <h1 className="text-xl font-bold text-slate-900">GreenSwap</h1>
             </div>
+            {/* <div className="flex items-center gap-4">
+              <Link href="/swipe">
+                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+                  Start Swiping
+                </Button>
+              </Link>
+              <Link href="/profile">
+                <Button variant="ghost" size="sm">
+                  Profile
+                </Button>
+              </Link>
+              <Link href="/matches">
+                <Button variant="ghost" size="sm">
+                  Matches
+                </Button>
+              </Link>
+            </div> */}
           </div>
         </div>
       </nav>
@@ -59,7 +43,7 @@ export default function WelcomePage() {
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Sparkles className="h-4 w-4" />
-            Welcome back, {user.username}!
+            Welcome back!
           </div>
           <h1 className="text-4xl font-bold text-slate-900 mb-4">
             Ready to discover amazing items?

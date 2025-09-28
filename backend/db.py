@@ -26,3 +26,4 @@ db = cluster["UserData"]
 
 users_col = db["flask_mongo"]
 items_col = db["items"]
+exchanges_col = db["exchanges"]

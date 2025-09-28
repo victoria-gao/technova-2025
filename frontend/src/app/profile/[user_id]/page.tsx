@@ -12,8 +12,14 @@ import { Avatar } from "@/components/ui/avatar";
 import { ArrowLeft, Camera, MapPin, Edit3, Plus, Trash2, X, Star } from "lucide-react";
 import Link from "next/link";
 
-export default function ProfilePage() {
-  const userId = "YOUR_USER_ID"; // replace with logged-in user's ID
+interface ProfilePageProps {
+  params: {
+    userId: string; // ✅ CHANGED
+  };
+}
+
+export default function ProfilePage({ params }: ProfilePageProps){
+  const { userId } = params; // replace with logged-in user's ID
 
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<any>({});
@@ -55,7 +61,7 @@ export default function ProfilePage() {
       }
     }
     fetchData();
-  }, []);
+  }, [userId]);
 
   const resetNewItem = () => {
     if (newItem.photoPreview) URL.revokeObjectURL(newItem.photoPreview);
@@ -74,7 +80,7 @@ export default function ProfilePage() {
       }
 
       const savedItem = await apiService.createItem({
-        user_id: userId,
+        user_id: userId, 
         name: newItem.name.trim(),
         description: newItem.description.trim(),
         category: newItem.category || "Other",
@@ -111,7 +117,7 @@ export default function ProfilePage() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/welcome">
+          <Link href={`/welcome/${userId}`}> 
             <Button variant="ghost" size="sm"><ArrowLeft className="h-4 w-4 mr-2"/>Back</Button>
           </Link>
           <h1 className="text-lg font-semibold text-slate-900">My Profile</h1>
