@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+pymongo
+numpy
+google-genai
+flask
+flask-cors
+flask-pymongo
