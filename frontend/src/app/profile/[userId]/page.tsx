@@ -21,8 +21,11 @@ import {
   X
 } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export default function ProfilePage() {
+  const params = useParams<{ userId: string }>();
+  const userId = params?.userId ?? "";
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     name: "Alex Johnson",
@@ -129,7 +132,7 @@ export default function ProfilePage() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/welcome">
+            <Link href={`/welcome/${userId}`}>
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back

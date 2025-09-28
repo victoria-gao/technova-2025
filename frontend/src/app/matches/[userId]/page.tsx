@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { ArrowLeft, ArrowLeftRight, MapPin, Star, CalendarDays } from "lucide-react";
+import { useParams } from "next/navigation";
 
 // Mock data for trade history
 const tradeHistory = [
@@ -75,13 +76,15 @@ const tradeHistory = [
 ];
 
 export default function MatchesPage() {
+  const params = useParams<{ userId: string }>();
+  const userId = params?.userId ?? "";
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/welcome">
+            <Link href={`/welcome/${userId}`}>
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
