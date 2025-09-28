@@ -4,7 +4,7 @@ from flask import Blueprint, request, jsonify
 # from google.auth.transport import requests as grequests
 # import os
 # from dotenv import load_dotenv
-
+from db import users_col, exchanges_col
 from user.models import User
 #from . import user_bp
 #from user.models import User
@@ -13,6 +13,7 @@ from user.models import User
 # GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
 user_bp = Blueprint('user', __name__)
+
 
 #placeholder below
 
@@ -32,19 +33,12 @@ def signup():
     return jsonify(result), status_code
 
 @user_bp.route("/login", methods=["POST"])
+@user_bp.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Invalid or missing JSON"}), 400
+    data = request.get_json()  # safer than request.json
+    result, status = User.login(data)  # use your User class login method
+    return jsonify(result), status
 
-    email = data.get('email')
-    password = data.get('password')
-
-    if not all([email, password]):
-        return jsonify({"error": "Missing fields"}), 400
-
-    result, status_code = User.login(data)
-    return jsonify(result), status_code
 
 @user_bp.route("/user/<user_id>", methods=["GET"])
 def get_user(user_id):
@@ -66,3 +60,11 @@ def update_user_profile(user_id):
     else:
         return jsonify({"error": "Failed to update profile"}), 400
 
+@user_bp.route("/user/<user_id>/exchanges", methods=["GET"])
+def get_user_exchanges(user_id):
+    exchanges = list(exchanges_col.find({
+        "$or": [{"user1_id": user_id}, {"user2_id": user_id}]
+    }))
+    for ex in exchanges:
+        ex["_id"] = str(ex["_id"])
+    return jsonify(exchanges)

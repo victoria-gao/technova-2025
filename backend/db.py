@@ -3,6 +3,12 @@ import os
 
 from dotenv import load_dotenv
 
+
+
+
+
+#items_col = mongo.db.items
+
 load_dotenv()
 
 MONGO_PASS = os.environ.get("MONGO_PASS")
@@ -15,4 +21,7 @@ uri = f"mongodb+srv://xenap26_db_user:{MONGO_PASS}@cluster0.htg8qve.mongodb.net/
 
 cluster = pymongo.MongoClient(uri)
 db = cluster["UserData"]
-collection = db["flask_mongo"]
+
+users_col = db["flask_mongo"]
+items_col = db["items"]
+exchanges_col = db["exchanges"]
