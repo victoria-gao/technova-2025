@@ -108,55 +108,55 @@ export default function HomePage() {
   };
 
   // If user is logged in, show dashboard
-  if (isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-rose-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-emerald-800 mb-4">
-              Welcome to GreenSwap, {user?.username}!
-            </h1>
-            <p className="text-lg text-emerald-600 mb-8">
-              Start discovering amazing items in your community
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-emerald-600 hover:bg-emerald-700"
-                onClick={() => router.push('/swipe')}
-              >
-                Start Swiping
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
-                onClick={() => router.push('/profile')}
-              >
-                My Profile
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-rose-500 text-rose-500 hover:bg-rose-50"
-                onClick={() => router.push('/matches')}
-              >
-                My Matches
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-red-500 text-red-500 hover:bg-red-50"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (isLoggedIn) {
+  //   return (
+  //     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-rose-50">
+  //       <div className="container mx-auto px-4 py-8">
+  //         <div className="text-center mb-8">
+  //           <h1 className="text-4xl font-bold text-emerald-800 mb-4">
+  //             Welcome to GreenSwap, {user?.username}!
+  //           </h1>
+  //           <p className="text-lg text-emerald-600 mb-8">
+  //             Start discovering amazing items in your community
+  //           </p>
+  //           <div className="flex gap-4 justify-center">
+  //             <Button 
+  //               size="lg" 
+  //               className="bg-emerald-600 hover:bg-emerald-700"
+  //               onClick={() => router.push('/swipe')}
+  //             >
+  //               Start Swiping
+  //             </Button>
+  //             <Button
+  //               variant="outline"
+  //               size="lg"
+  //               className="border-emerald-600 text-emerald-600 hover:bg-emerald-50"
+  //               onClick={() => router.push('/profile')}
+  //             >
+  //               My Profile
+  //             </Button>
+  //             <Button
+  //               variant="outline"
+  //               size="lg"
+  //               className="border-rose-500 text-rose-500 hover:bg-rose-50"
+  //               onClick={() => router.push('/matches')}
+  //             >
+  //               My Matches
+  //             </Button>
+  //             <Button
+  //               variant="outline"
+  //               size="lg"
+  //               className="border-red-500 text-red-500 hover:bg-red-50"
+  //               onClick={handleLogout}
+  //             >
+  //               Logout
+  //             </Button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen">
