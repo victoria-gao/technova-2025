@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 import os
+from db import items_col
 import uuid
 from .models import Item
 
@@ -12,6 +13,29 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@item_bp.route("/items", methods=["POST"])
+def add_item():
+    data = request.json
+    required_fields = ["user_id", "name", "description", "category", "condition", "image", "status"]
+    
+    if not all(field in data for field in required_fields):
+        return jsonify({"error": "Missing required fields"}), 400
+
+    item = {
+        "user_id": data["user_id"],
+        "name": data["name"],
+        "description": data["description"],
+        "category": data["category"],
+        "condition": data["condition"],
+        "image": data["image"],
+        "status": data["status"],
+    }
+
+    result = items_col.insert_one(item)
+    item["_id"] = str(result.inserted_id)  # convert ObjectId to string for frontend
+    return jsonify(item), 201
 
 @item_bp.route("/items/upload-image", methods=["POST"])
 def upload_image():

@@ -15,6 +15,7 @@ from flask import Blueprint
 app = Flask(__name__)
 CORS(app)
 
+
 app.register_blueprint(user_bp)
 app.register_blueprint(item_bp)
 app.register_blueprint(exchange_bp)
