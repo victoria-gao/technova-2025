@@ -3,7 +3,7 @@ import secrets
 from flask import Flask, jsonify
 from flask_pymongo import PyMongo
 from flask import current_app
-from db import collection
+from db import users_col
 from bson.objectid import ObjectId
 mongo = PyMongo()
 
@@ -22,12 +22,12 @@ class User:
     @staticmethod
     def signup(username, email, password):
         #Check if username already exists
-        existing_user = collection.find_one({"username": username})
+        existing_user = users_col.find_one({"username": username})
         if existing_user:
             return {"error": "Username already exists"}, 400
         
         #Check if email already exists
-        existing_email = collection.find_one({"email": email})
+        existing_email = users_col.find_one({"email": email})
         if existing_email:
             return {"error": "Email already exists"}, 400
         
@@ -52,7 +52,7 @@ class User:
                 "rating": 0.0
             }
         }
-        result = collection.insert_one(user)
+        result = users_col.insert_one(user)
         return {"message": "User created successfully"}, 200
 
     @staticmethod
@@ -63,7 +63,7 @@ class User:
         if not email or not password:
             return {"error": "Email and password required"}, 400
         
-        user = collection.find_one({"email": email})
+        user = users_col.find_one({"email": email})
         if not user:
             return {"error": "Invalid credentials"}, 401
 
@@ -84,7 +84,7 @@ class User:
     @staticmethod
     def get_user_by_id(user_id):
         try:
-            user = collection.find_one({"_id": ObjectId(user_id)})
+            user = users_col.find_one({"_id": ObjectId(user_id)})
             if user:
                 return {
                     "user_id": str(user["_id"]),
@@ -100,7 +100,7 @@ class User:
     @staticmethod
     def update_profile(user_id, profile_data):
         try:
-            result = collection.update_one(
+            result = users_col.update_one(
                 {"_id": ObjectId(user_id)},
                 {"$set": {"profile": profile_data}}
             )
@@ -119,15 +119,15 @@ class User:
 #    #    "name": str
 #    #}
     
-#    existing = collection.find_one({"google_id": google_user_info["google_id"]})
+#    existing = users_col.find_one({"google_id": google_user_info["google_id"]})
 #    if existing:
 #        return str(existing["_id"])  #user already exists
 
-#    result = collection.insert_one(google_user_info)
+#    result = users_col.insert_one(google_user_info)
 #    return str(result.inserted_id)
         
 #def get_user_by_google_id(google_id):
-#    return collection.find_one({"google_id": google_id})
+#    return users_col.find_one({"google_id": google_id})
 #    #def __init__(self, username):
 #    #    self.username = username
 

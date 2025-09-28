@@ -24,10 +24,3 @@ def add_item_for_user(username, title, description):
     res = items_col.insert_one(doc)
     return str(res.inserted_id)
 
-if __name__ == "__main__":
-    new_id = add_item_for_user(
-        username="kim",
-        title="Vintage Leather Jacket",
-        description="Stylish vintage leather jacket; great for fall/winter."
-    )
-    print("Inserted item:", new_id)

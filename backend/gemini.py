@@ -16,8 +16,8 @@ TAG_PROMPT = (
     "Use lowercase single words where possible; no hashtags; no brand guessing."
 )
 
-title = "Vintage Leather Jacket"
-description = "A stylish vintage leather jacket in great condition. Perfect for fall and winter wear." #FOR TESTING PURPOSES, REMOVE LATER
+#title = "Vintage Leather Jacket"
+#description = "A stylish vintage leather jacket in great condition. Perfect for fall and winter wear." #FOR TESTING PURPOSES, REMOVE LATER
 
 def generate_tags(title, description):
     prompt = f"{TAG_PROMPT}\n\nTitle: {title}\nDescription: {description}\n"
