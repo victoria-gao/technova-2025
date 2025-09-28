@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import apiService from "@/lib/api";
 import { 
   Leaf, 
   Recycle, 
@@ -18,6 +20,56 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [loading, setLoading] = useState<{ login: boolean; signup: boolean }>({ login: false, signup: false });
+  const [error, setError] = useState<{ login?: string; signup?: string }>({});
+
+  const handleLogin = async () => {
+    setError({});
+    setLoading((s) => ({ ...s, login: true }));
+    try {
+      const data = await apiService.login({ email: loginEmail, password: loginPassword });
+      // Optionally persist minimal user info
+      if (data?.user_id) {
+        try {
+          localStorage.setItem("gs_user", JSON.stringify(data));
+        } catch {}
+      }
+      router.push("/welcome");
+    } catch (e: any) {
+      const message = e?.response?.data?.error || "Failed to sign in. Please try again.";
+      setError((s) => ({ ...s, login: message }));
+    } finally {
+      setLoading((s) => ({ ...s, login: false }));
+    }
+  };
+
+  const handleSignup = async () => {
+    setError({});
+    setLoading((s) => ({ ...s, signup: true }));
+    try {
+      await apiService.signup({ username: signupName, email: signupEmail, password: signupPassword });
+      // After successful signup, attempt login to streamline UX
+      try {
+        const data = await apiService.login({ email: signupEmail, password: signupPassword });
+        if (data?.user_id) {
+          try {
+            localStorage.setItem("gs_user", JSON.stringify(data));
+          } catch {}
+        }
+      } catch {}
+      router.push("/welcome");
+    } catch (e: any) {
+      const message = e?.response?.data?.error || "Failed to create account. Please try again.";
+      setError((s) => ({ ...s, signup: message }));
+    } finally {
+      setLoading((s) => ({ ...s, signup: false }));
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -111,6 +163,8 @@ export default function HomePage() {
                           id="email" 
                           type="email" 
                           placeholder="your@email.com" 
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
                           className="h-11"
                         />
                       </div>
@@ -120,14 +174,20 @@ export default function HomePage() {
                           id="password" 
                           type="password" 
                           placeholder="••••••••" 
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
                           className="h-11"
                         />
                       </div>
+                      {error.login && (
+                        <p className="text-sm text-red-600" role="alert">{error.login}</p>
+                      )}
                       <Button 
                         className="w-full h-11 bg-emerald-600 hover:bg-emerald-700" 
-                        onClick={() => router.push("/welcome")}
+                        onClick={handleLogin}
+                        disabled={loading.login}
                       >
-                        Sign In
+                        {loading.login ? "Signing In..." : "Sign In"}
                       </Button>
                       <div className="text-center">
                         <Button variant="link" className="text-slate-600 hover:text-slate-900">
@@ -142,6 +202,8 @@ export default function HomePage() {
                         <Input 
                           id="name" 
                           placeholder="Your Name" 
+                          value={signupName}
+                          onChange={(e) => setSignupName(e.target.value)}
                           className="h-11"
                         />
                       </div>
@@ -151,6 +213,8 @@ export default function HomePage() {
                           id="signup-email" 
                           type="email" 
                           placeholder="your@email.com" 
+                          value={signupEmail}
+                          onChange={(e) => setSignupEmail(e.target.value)}
                           className="h-11"
                         />
                       </div>
@@ -160,14 +224,20 @@ export default function HomePage() {
                           id="signup-password" 
                           type="password" 
                           placeholder="••••••••" 
+                          value={signupPassword}
+                          onChange={(e) => setSignupPassword(e.target.value)}
                           className="h-11"
                         />
                       </div>
+                      {error.signup && (
+                        <p className="text-sm text-red-600" role="alert">{error.signup}</p>
+                      )}
                       <Button 
                         className="w-full h-11 bg-emerald-600 hover:bg-emerald-700" 
-                        onClick={() => router.push("/welcome")}
+                        onClick={handleSignup}
+                        disabled={loading.signup}
                       >
-                        Create Account
+                        {loading.signup ? "Creating Account..." : "Create Account"}
                       </Button>
                       <p className="text-xs text-center text-slate-500">
                         By signing up, you agree to our Terms and Privacy Policy
