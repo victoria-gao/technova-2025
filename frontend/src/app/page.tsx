@@ -39,7 +39,7 @@ export default function HomePage() {
           localStorage.setItem("gs_user", JSON.stringify(data));
         } catch {}
       }
-      router.push("/welcome");
+      router.push(`/welcome/${data.user_id}`);
     } catch (e: any) {
       const message = e?.response?.data?.error || "Failed to sign in. Please try again.";
       setError((s) => ({ ...s, login: message }));

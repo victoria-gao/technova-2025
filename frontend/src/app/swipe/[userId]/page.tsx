@@ -18,6 +18,7 @@ import {
   Search
 } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 // Mock data for items
 const mockItems = [
@@ -72,6 +73,8 @@ const mockItems = [
 ];
 
 export default function SwipePage() {
+  const params = useParams<{ userId: string }>();
+  const userId = params?.userId ?? "";
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [likedItems, setLikedItems] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -156,7 +159,7 @@ export default function SwipePage() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/welcome">
+            <Link href={`/welcome/${userId}`}>
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back

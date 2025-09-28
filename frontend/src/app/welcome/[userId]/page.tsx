@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Leaf, Sparkles, ArrowRight } from "lucide-react";
 
-export default function WelcomePage() {
+export default function WelcomeUserPage() {
+  const params = useParams<{ userId: string }>();
+  const userId = params?.userId ?? "";
+
   return (
     <div className="min-h-screen">
       {/* Navigation */}
@@ -18,31 +22,14 @@ export default function WelcomePage() {
               <h1 className="text-xl font-bold text-slate-900">GreenSwap</h1>
             </div>
             <Link href="/">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="ml-6 px-3 py-1 rounded-full bg-red-400 text-white hover:bg-red-500 hover:text-white"
-                >
-                  Log Out
-                </Button>
-              </Link>
-            {/* <div className="flex items-center gap-4">
-              <Link href="/swipe">
-                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                  Start Swiping
-                </Button>
-              </Link>
-              <Link href="/profile">
-                <Button variant="ghost" size="sm">
-                  Profile
-                </Button>
-              </Link>
-              <Link href="/matches">
-                <Button variant="ghost" size="sm">
-                  Matches
-                </Button>
-              </Link>
-            </div> */}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="ml-6 px-3 py-1 rounded-full bg-red-400 text-white hover:bg-red-500 hover:text-white"
+              >
+                Log Out
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -61,23 +48,24 @@ export default function WelcomePage() {
             Your sustainable journey continues. Find your next favorite item or share something special with the community.
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/swipe">
+            <Link href={`/swipe/${userId}`}>
               <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
                 Start Swiping
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
-            <Link href="/profile">
+            <Link href={`/profile/${userId}`}>
               <Button variant="outline" size="lg">
                 Manage Profile
               </Button>
             </Link>
-            <Link href="/matches">
+            <Link href={`/matches/${userId}`}>
               <Button variant="outline" size="lg">
                 Matches
               </Button>
             </Link>
           </div>
+          <p className="mt-6 text-xs text-slate-500">User ID: {userId}</p>
         </div>
       </div>
     </div>
