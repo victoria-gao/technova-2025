@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,8 @@ import {
   Star,
   Edit3,
   Plus,
-  Trash2
+  Trash2,
+  X
 } from "lucide-react";
 import Link from "next/link";
 
@@ -33,7 +34,7 @@ export default function ProfilePage() {
     joined: "March 2023"
   });
 
-  const [myItems] = useState([
+  const [myItems, setMyItems] = useState([
     {
       id: 1,
       name: "Vintage Camera",
@@ -60,6 +61,63 @@ export default function ProfilePage() {
     }
   ]);
 
+  // Add Item modal state
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newItem, setNewItem] = useState({
+    name: "",
+    description: "",
+    category: "",
+    condition: "Excellent",
+    photoFile: null as File | null,
+    photoPreview: "" as string
+  });
+
+  const categoryOptions = useMemo(
+    () => [
+      "Electronics",
+      "Fashion",
+      "Kitchen",
+      "Books",
+      "Plants",
+      "Home",
+      "Toys",
+      "Other"
+    ],
+    []
+  );
+
+  const conditionOptions = ["Excellent", "Good", "Fair"] as const;
+
+  const resetNewItem = () => {
+    if (newItem.photoPreview) URL.revokeObjectURL(newItem.photoPreview);
+    setNewItem({
+      name: "",
+      description: "",
+      category: "",
+      condition: "Excellent",
+      photoFile: null,
+      photoPreview: ""
+    });
+  };
+
+  const handleAddItemSubmit = () => {
+    if (!newItem.name.trim() || !newItem.description.trim()) return;
+    const nextId = myItems.length ? Math.max(...myItems.map(i => i.id)) + 1 : 1;
+    setMyItems([
+      ...myItems,
+      {
+        id: nextId,
+        name: newItem.name.trim(),
+        description: newItem.description.trim(),
+        image: newItem.photoPreview || "https://via.placeholder.com/300x300.png?text=Item",
+        category: newItem.category || "Other",
+        status: "Available"
+      }
+    ]);
+    setIsAddModalOpen(false);
+    resetNewItem();
+  };
+
   const handleSave = () => {
     setIsEditing(false);
     // Here you would typically save to backend
@@ -71,7 +129,7 @@ export default function ProfilePage() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
+            <Link href="/welcome">
               <Button variant="ghost" size="sm">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
@@ -195,7 +253,7 @@ export default function ProfilePage() {
                     Items you've listed for swapping
                   </CardDescription>
                 </div>
-                <Button size="sm">
+                <Button size="sm" onClick={() => setIsAddModalOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Item
                 </Button>
@@ -265,6 +323,112 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Add Item Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setIsAddModalOpen(false); resetNewItem(); }} />
+          <div className="relative z-[61] w-full max-w-lg mx-4">
+            <div className="bg-white rounded-xl shadow-2xl border">
+              <div className="flex items-center justify-between px-6 py-4 border-b">
+                <h3 className="text-lg font-semibold text-slate-900">Add New Item</h3>
+                <Button variant="ghost" size="icon" onClick={() => { setIsAddModalOpen(false); resetNewItem(); }} className="h-9 w-9">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="item-name">Item Name</Label>
+                  <Input
+                    id="item-name"
+                    placeholder="e.g., Vintage Camera"
+                    value={newItem.name}
+                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="item-description">Description</Label>
+                  <Textarea
+                    id="item-description"
+                    rows={4}
+                    placeholder="Describe the item's condition, brand, size, and any details buyers should know."
+                    value={newItem.description}
+                    onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="item-condition">Condition</Label>
+                    <select
+                      id="item-condition"
+                      className="w-full h-10 border rounded-md px-3 text-sm bg-white"
+                      value={newItem.condition}
+                      onChange={(e) => setNewItem({ ...newItem, condition: e.target.value })}
+                    >
+                      {conditionOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="item-category">Category</Label>
+                    <select
+                      id="item-category"
+                      className="w-full h-10 border rounded-md px-3 text-sm bg-white"
+                      value={newItem.category}
+                      onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
+                    >
+                      <option value="" disabled>Select a category</option>
+                      {categoryOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="item-photo">Item Photo</Label>
+                  <div className="flex items-center gap-4">
+                    <Input
+                      id="item-photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        if (!file) {
+                          if (newItem.photoPreview) URL.revokeObjectURL(newItem.photoPreview);
+                          setNewItem({ ...newItem, photoFile: null, photoPreview: "" });
+                          return;
+                        }
+                        const preview = URL.createObjectURL(file);
+                        if (newItem.photoPreview) URL.revokeObjectURL(newItem.photoPreview);
+                        setNewItem({ ...newItem, photoFile: file, photoPreview: preview });
+                      }}
+                    />
+                    {newItem.photoPreview && (
+                      <img src={newItem.photoPreview} alt="Preview" className="h-16 w-16 object-cover rounded-md border" />
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t">
+                <Button variant="outline" onClick={() => { setIsAddModalOpen(false); resetNewItem(); }}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAddItemSubmit}
+                  disabled={!newItem.name.trim() || !newItem.description.trim()}
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  Add Item
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
