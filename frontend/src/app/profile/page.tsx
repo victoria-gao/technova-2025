@@ -136,13 +136,15 @@ export default function ProfilePage() {
               </Button>
             </Link>
             <h1 className="text-lg font-semibold text-slate-900">My Profile</h1>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setIsEditing(!isEditing)}
-            >
-              <Edit3 className="h-4 w-4" />
-            </Button>
+            <Link href="/">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="ml-6 px-3 py-1 rounded-full bg-red-400 text-white hover:bg-red-500 hover:text-white"
+                >
+                  Log Out
+                </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -152,6 +154,17 @@ export default function ProfilePage() {
           {/* Profile Header */}
           <Card className="border-0 shadow-sm">
             <CardContent className="p-8">
+              
+            <div className="right-0 flex justify-end mb-4">
+              <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              <Edit3 className="h-4 w-4 right" />
+              </Button>
+            </div>
+
               <div className="flex flex-col md:flex-row gap-8 items-start">
                 <div className="relative">
                   <Avatar 

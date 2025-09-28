@@ -115,13 +115,15 @@ export default function MatchesPage() {
               </Button>
             </Link>
             <h1 className="text-lg font-semibold text-slate-900">My Matches</h1>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <Filter className="h-4 w-4" />
-            </Button>
+            <Link href="/">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="ml-6 px-3 py-1 rounded-full bg-red-400 text-white hover:bg-red-500 hover:text-white"
+                >
+                  Log Out
+                </Button>
+            </Link>
           </div>
         </div>
       </header>
