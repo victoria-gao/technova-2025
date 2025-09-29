@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 from db import items_col, users_col
 
 class Item:
+    #works
     @staticmethod
     def create_item(user_id, item_data):
         """Create a new item"""
@@ -26,30 +27,29 @@ class Item:
         except Exception as e:
             return {"error": f"Failed to create item: {str(e)}"}, 400
     
+    #works
     @staticmethod
-    def get_items_for_user(user_id, exclude_user=True):
+    def get_items_for_browsing(user_id, exclude_user=True):
         """Get items for browsing (excluding user's own items)"""
-        try:
-            query = {"status": "available"}
-            if exclude_user:
-                query["user_id"] = {"$ne": ObjectId(user_id)}
-            
-            items = list(items_col.find(query).sort("created_at", -1))
-            
-            # Convert ObjectId to string and add user info
-            for item in items:
-                item["_id"] = str(item["_id"])
-                item["user_id"] = str(item["user_id"])
-                # Get user info for each item
-                user = users_col.find_one({"_id": ObjectId(item["user_id"])})
-                if user:
-                    item["owner"] = {
-                        "username": user.get("username"),
-                        "profile": user.get("profile", {})
-                    }
-            
-            return items, 200
-        except Exception as e:
+        try: 
+            query = {"status": "available"} 
+            if exclude_user: 
+                query["user_id"] = {"$ne": ObjectId(user_id)} 
+            items = list(items_col.find(query).sort("created_at", -1)) 
+            # Convert ObjectId to string and add user info 
+            for item in items: 
+                u_id = item["user_id"] # Get user info for each item 
+                item["_id"] = str(item["_id"]) 
+                item["user_id"] = str(item["user_id"]) 
+                
+                user = users_col.find_one({"_id": u_id}) 
+                if user: 
+                    item["owner"] = { 
+                        "username": user.get("username"), 
+                        "profile": user.get("profile", {}) 
+                    } 
+            return items, 200 
+        except Exception as e: 
             return [], 400
     
     @staticmethod

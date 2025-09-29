@@ -14,28 +14,18 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+#works
 @item_bp.route("/items", methods=["POST"])
-def add_item():
+def create_item():
     data = request.json
-    required_fields = ["user_id", "name", "description", "category", "condition", "image", "status"]
+    required_fields = ["user_id", "title", "description", "category", "location", "condition"]
     
     if not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
 
-    item = {
-        "user_id": data["user_id"],
-        "name": data["name"],
-        "description": data["description"],
-        "category": data["category"],
-        "condition": data["condition"],
-        "image": data["image"],
-        "status": data["status"],
-    }
-
-    result = items_col.insert_one(item)
-    item["_id"] = str(result.inserted_id)  # convert ObjectId to string for frontend
-    return jsonify(item), 201
+    response, status_code = Item.create_item(data["user_id"], data)
+    return jsonify(response), status_code
+    
 
 @item_bp.route("/items/upload-image", methods=["POST"])
 def upload_image():
@@ -71,39 +61,45 @@ def uploaded_file(filename):
     """Serve uploaded images"""
     return send_from_directory(UPLOAD_FOLDER, filename)
 
-@item_bp.route("/items", methods=["POST"])
-def create_item():
-    """Create a new item"""
-    data = request.json
-    user_id = data.get("user_id")
+# @item_bp.route("/items", methods=["POST"])
+# def create_item():
+#     """Create a new item"""
+#     data = request.json
+#     user_id = data.get("user_id")
     
-    if not user_id:
-        return jsonify({"error": "User ID required"}), 400
+#     if not user_id:
+#         return jsonify({"error": "User ID required"}), 400
     
-    required_fields = ["title", "description", "category", "condition", "location"]
-    for field in required_fields:
-        if not data.get(field):
-            return jsonify({"error": f"Missing required field: {field}"}), 400
+#     required_fields = ["title", "description", "category", "condition", "location"]
+#     for field in required_fields:
+#         if not data.get(field):
+#             return jsonify({"error": f"Missing required field: {field}"}), 400
     
-    result, status_code = Item.create_item(user_id, data)
-    return jsonify(result), status_code
+#     result, status_code = Item.create_item(user_id, data)
+#     return jsonify(result), status_code
 
+
+#works
+#get OTHER user items
+#/items?user_id=_____
 @item_bp.route("/items", methods=["GET"])
-def get_items():
+def get_items_for_browsing():
     """Get items for browsing"""
     user_id = request.args.get("user_id")
     if not user_id:
         return jsonify({"error": "User ID required"}), 400
     
-    items, status_code = Item.get_items_for_user(user_id)
+    items, status_code = Item.get_items_for_browsing(user_id, exclude_user=True)
     return jsonify({"items": items}), status_code
 
+#works
 @item_bp.route("/items/user/<user_id>", methods=["GET"])
 def get_user_items(user_id):
     """Get items posted by a specific user"""
     items, status_code = Item.get_user_items(user_id)
     return jsonify({"items": items}), status_code
 
+#do we need this?
 @item_bp.route("/items/<item_id>", methods=["GET"])
 def get_item(item_id):
     """Get a specific item by ID"""
