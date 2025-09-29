@@ -17,13 +17,42 @@ def allowed_file(filename):
 #works
 @item_bp.route("/items", methods=["POST"])
 def create_item():
-    data = request.json
-    required_fields = ["user_id", "title", "description", "category", "location", "condition"]
+    user_id = request.form.get("user_id")
+    if not user_id:
+        return jsonify({"error": "User ID required"}), 400
     
-    if not all(field in data for field in required_fields):
+    title = request.form.get("title")
+    description = request.form.get("description")
+    category = request.form.get("category")
+    condition = request.form.get("condition")
+    location = request.form.get("location")
+    user_id = request.form.get("user_id")  # send from frontend if needed
+    required_fields = ["user_id", "title", "description", "category", "condition"]
+    
+    if not all(field in request.form for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
 
-    response, status_code = Item.create_item(data["user_id"], data)
+    images = []
+    
+
+    item_data = {
+        "title": title,
+        "description": description,
+        "category": category,
+        "condition": condition,
+        "location": location,
+        "images": images
+    }
+    if "images" in request.files:
+        files = request.files.getlist("images")
+        for file in files:
+            filename = secure_filename(file.filename)
+            path = os.path.join(UPLOAD_FOLDER, filename)
+            file.save(path)
+            item_data["images"].append(path)  # or URL if you serve static files
+    
+
+    response, status_code = Item.create_item(user_id, item_data)
     return jsonify(response), status_code
     
 
