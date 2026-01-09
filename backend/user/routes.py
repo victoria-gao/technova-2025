@@ -33,9 +33,8 @@ def signup():
     return jsonify(result), status_code
 
 @user_bp.route("/login", methods=["POST"])
-@user_bp.route("/login", methods=["POST"])
 def login():
-    data = request.get_json()  # safer than request.json
+    data = request.get_json(silent=True) or {}  # safer than request.json
     result, status = User.login(data)  # use your User class login method
     return jsonify(result), status
 
